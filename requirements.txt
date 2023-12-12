@@ -1,0 +1,9 @@
+geopandas
+pandas
+matplotlib
+numpy
+rasterio
+shapely
+geopy
+windrose
+pykrige
