@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='PositionData',
-    version='0.1.0',
+    version='0.1.1',
     packages=find_packages(),
     description='Gereferenced CSV data processing',
     long_description=open('README.md').read(),
@@ -14,9 +14,9 @@ setup(
         'geopandas',
         'pandas',
         'numpy',
-        'rasterio'
-        'shapely'
-        'geopy'
+        'rasterio',
+        'shapely',
+        'geopy',
         'windrose'
     ],
     classifiers=[
