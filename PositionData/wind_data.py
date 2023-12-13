@@ -1,6 +1,4 @@
 import geopandas as gpd
-from geopy.distance import geodesic
-from windrose import WindroseAxes
 import math
 import numpy as np
 import pandas as pd

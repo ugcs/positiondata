@@ -1,13 +1,9 @@
 import geopandas as gpd
-from geopy.distance import geodesic
-from windrose import WindroseAxes
 import matplotlib.pyplot as plt
 import math
 import numpy as np
 import pandas as pd
-import rasterio
-from rasterio.transform import from_origin
-from shapely.geometry import Point, LineString, MultiLineString
+from shapely.geometry import Point
 from scipy.interpolate import griddata
 
 
