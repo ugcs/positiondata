@@ -17,6 +17,7 @@ class TestPositionData(unittest.TestCase):
         cls.wind1_clipped_rows = 5156
         cls.wind1_clipped_columns = 19
         cls.wind1_polygon_path = 'tests/data/wind/big-area.json'
+        cls.wind1_platform_direction_column = "Direction"
 
     # Test shape
     def test_shape(self):
@@ -34,6 +35,12 @@ class TestPositionData(unittest.TestCase):
         clipped = self.position_data_wind1.clip_by_polygon(self.wind1_polygon_path)
         shape = clipped.shape()
         self.assertEqual(shape, (self.wind1_clipped_rows, self.wind1_clipped_columns)) 
+
+    # Test direction 
+    def test_calculate_direction(self):
+        clipped = self.position_data_wind1.clip_by_polygon(self.wind1_polygon_path)
+        direction = clipped.calculate_direction(self.wind1_platform_direction_column)
+        self.assertTrue(self.wind1_platform_direction_column in direction.data.columns)
 
 
 if __name__ == '__main__':

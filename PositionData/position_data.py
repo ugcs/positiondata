@@ -222,23 +222,27 @@ class PositionData:
         """
         directions = []
 
-        for idx, row in self.data.iterrows():
+        # Iterate over the rows, stopping before the last row
+        for idx in range(len(self.data) - 1):
+            row = self.data.iloc[idx]
             geom = row.geometry
-            if geom is not None and geom.geom_type == 'Point' and not row.geometry.is_empty:
-                if idx == len(self.data) - 1:
-                    directions.append(0)
+
+            if geom is not None and geom.geom_type == 'Point' and not geom.is_empty:
+                next_row = self.data.iloc[idx + 1]
+                next_geom = next_row.geometry
+
+                if next_geom is not None and next_geom.geom_type == 'Point' and not next_geom.is_empty:
+                    start_point = (geom.y, geom.x)
+                    end_point = (next_geom.y, next_geom.x)
+                    angle = self.get_azimuth(start_point, end_point)
+                    directions.append(angle)
                 else:
-                    next_row = self.data.iloc[idx + 1]
-                    next_geom = next_row.geometry
-                    if next_geom is not None and next_geom.geom_type == 'Point' and not next_row.geometry.is_empty:
-                        start_point = (row.geometry.y, row.geometry.x)
-                        end_point = (next_row.geometry.y, next_row.geometry.x)
-                        angle = self.get_azimuth(start_point, end_point)
-                        directions.append(angle)
-                    else:
-                        directions.append(None)
+                    directions.append(None)
             else:
                 directions.append(None)
+
+        # Append a default value (e.g., 0 or None) for the last point
+        directions.append(None)  # or some default value
 
         # Create a new instance of PositionData with direction data
         result = PositionData.__new__(PositionData)
