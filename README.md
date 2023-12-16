@@ -34,7 +34,7 @@ wind_data.build_windrose('TrueWindSpeed', 'TrueWindDirection', 'windrose.png')
 The `PositionData` class is designed for handling and processing geospatial data from CSV or GeoJSON files. It provides methods for cleaning data, filtering, clipping, computing statistics, and more.
 
 ## Initialization
-### `PositionDate(input_file, file_format='csv', latitude_prop='Latitude', longitude_prop='Longitude', crs="epsg:4326")`
+### `PositionData(input_file, file_format='csv', latitude_prop='Latitude', longitude_prop='Longitude', crs="epsg:4326")`
 Initializes the `PositionData` object with data from a CSV or GeoJSON file.
 
 #### Parameters:
