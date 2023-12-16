@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 from PositionData import PositionData
 from scipy.interpolate import griddata
+from windrose import WindroseAxes
+import matplotlib.pyplot as plt
 
 class WindData:
     def __init__(self, position_data,air_speed_prop, air_dir_prop, platform_speed_prop, platform_dir_prop, true_speed_prop, true_dir_prop, sensor_cw_rot = 0, sensor_to_north = False):
@@ -140,6 +142,23 @@ class WindData:
 
         # Return a new PositionData instance
         result = PositionData.__new__(PositionData)
-        result.data = grid_df.copy()
+        result.data = grid_df.copy(deep = True)
 
         return result
+    
+    def build_windrose(self, speed_col, direction_col, output_path, bins = [0,2,4,6,8,10], nsector = 16, title="Windrose"):
+        """
+        Build a windrose plot and save it to the specified path.
+
+        :param speed_col: Name of the wind speed column.
+        :param direction_col: Name of the wind direction column.
+        :param output_path: Path to save the generated windrose image.
+        """
+        ax = WindroseAxes.from_ax()
+        ax.bar(self.position_data.data[direction_col].astype(float), self.position_data.data[speed_col].astype(float), normed=True, 
+               opening=0.8, edgecolor='white', bins = bins, nsector = nsector)
+        ax.set_title(title)
+        ax.set_legend()
+
+        plt.savefig(output_path, bbox_inches='tight')
+        plt.close()

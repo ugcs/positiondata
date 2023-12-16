@@ -2,6 +2,9 @@ import unittest
 from PositionData.position_data import PositionData
 from PositionData.wind_data import WindData
 import numpy as np
+import os
+import tempfile
+import shutil
 
 class TestWindMap(unittest.TestCase):
 
@@ -25,6 +28,23 @@ class TestWindMap(unittest.TestCase):
         cls.reference_speed_prop = "Reference:TrueWindSpeed"
         cls.reference_direction_prop = "Reference:TrueWindDirection"
 
+        cls.position_data_wind3 = PositionData('tests/data/wind/wind_rose1.csv')
+        cls.position_data_wind4= PositionData('tests/data/wind/wind_rose2.csv')
+
+        # create temp dir
+        cls.temp_dir = tempfile.mkdtemp() 
+        cls.wind_rose1_img = os.path.join(cls.temp_dir, 'wind_rose1.jpg')
+        cls.wind_rose2_img = os.path.join(cls.temp_dir, 'wind_rose2.jpg')
+        cls.clean_temp = True
+        print(cls.temp_dir)
+    
+    @classmethod
+    def tearDownClass(cls):
+        # This is executed after each test
+        # Remove the temporary directory
+        if os.path.exists(cls.temp_dir) and cls.clean_temp:
+            shutil.rmtree(cls.temp_dir)
+
     # Test shape
     def test_grid_wind(self):
         wind_data = WindData(self.position_data_wind1, self.air_speed_prop, self.air_dir_prop, self.platform_speed_prop, self.platform_dir_prop,
@@ -33,7 +53,7 @@ class TestWindMap(unittest.TestCase):
         shape = gridded.shape()
         self.assertEqual(shape, (self.wind1_grid_size * self.wind1_grid_size, self.wind1_grid_columns))
 
-    # test 
+    # test true wind calculation
     def test_true_wind(self):
         true_wind_samples = WindData(self.position_data_wind2, self.air_speed_prop, self.air_dir_prop, self.platform_speed_prop, self.platform_dir_prop,
                            self.true_speed_prop, self.true_dir_prop)
@@ -52,3 +72,17 @@ class TestWindMap(unittest.TestCase):
         if(direction_mismatching_rows.shape[0] > 0): 
             print(direction_mismatching_rows[[self.reference_direction_prop, self.true_dir_prop]])
         self.assertTrue(direction_mismatching_rows.shape[0] == 0)
+
+    # wind rose: movement to north, headwind
+    def test_wind_rose_north(self):
+        wind_rose = WindData(self.position_data_wind3, self.air_speed_prop, self.air_dir_prop, self.platform_speed_prop, self.platform_dir_prop,
+                           self.true_speed_prop, self.true_dir_prop)
+        wind_rose.build_windrose(self.true_speed_prop, self.true_dir_prop, self.wind_rose1_img)
+        self.assertTrue(os.path.exists(self.wind_rose1_img))
+
+    # wind rose: movement to north, sw wind
+    def test_wind_rose_sw(self):
+        wind_rose = WindData(self.position_data_wind4, self.air_speed_prop, self.air_dir_prop, self.platform_speed_prop, self.platform_dir_prop,
+                           self.true_speed_prop, self.true_dir_prop)
+        wind_rose.build_windrose(self.true_speed_prop, self.true_dir_prop, self.wind_rose2_img)
+        self.assertTrue(os.path.exists(self.wind_rose2_img))
