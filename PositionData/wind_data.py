@@ -36,47 +36,55 @@ class WindData:
         :param platform_dir_prop: Property name for platform direction.
         :param true_speed_prop: Property name for true wind speed.
         :param true_dir_prop: Property name for true wind direction.
-        :param sensor_cw_rot: CW rotation of the sensor relative to platform noze
+        :param sensor_cw_rot: CW rotation (angles) of the sensor relative to platform noze
         :param sensor_to_north: if true, means that sensor readings are related to North, otherwise relative to platform noze
         :return: New instance of PositionData with calculated true wind.
         """
-        new_gdf = position_data.data.copy()
+        new_gdf = position_data.data.copy(deep=True)
+        twoxpi = (2 * math.pi)
+        tolerance = -0.001
 
         for idx, row in new_gdf.iterrows():
             try:
-                # Platform vector
-                platform_speed = float(row[platform_speed_prop])
-                platform_dir = math.radians(float(row[platform_dir_prop]))  # Convert degrees to radians
+                # platform speed
+                pv = float(row[platform_speed_prop])
+                # plaform direction relative to north
+                pd =  math.radians(float(row[platform_dir_prop]))
+                # registered wind velocity
+                rwv = float(row[air_speed_prop])
+                # registered wind direction
+                rwd = math.radians(float(row[air_dir_prop]))
+                # if sensor readings are relative to platform body
+                # calculate engle relative to north
+                if not sensor_to_north:
+                    rwd = (pd + rwd + math.radians(sensor_cw_rot)) % twoxpi
+                # when platform is moving we get an artificial wind in the opposite direction
+                #awd = (pd + math.pi) % twoxpi
 
-                platform_x = platform_speed * math.sin(platform_dir)
-                platform_y = platform_speed * math.cos(platform_dir)
+                # now calculate vector components
+                px = pv * math.cos(pd)
+                py = pv * math.sin(pd)
+                rwx = rwv * math.cos(rwd)
+                rwy = rwv * math.sin(rwd)
+                # calculate true wind vector
+                twx = rwx - px
+                twy = rwy - py
 
-                # Measured wind vector
-                # TODO take into account sensor orientation and reference datum
-                wind_speed = float(row[air_speed_prop])
-                wind_dir = math.radians(float(row[air_dir_prop]))
-
-                wind_x = wind_speed * math.sin(wind_dir)
-                wind_y = wind_speed * math.cos(wind_dir)
-
-                # True wind vector
-                true_wind_x = wind_x - platform_x
-                true_wind_y = wind_y - platform_y 
-
-                # Convert back to speed and direction
-                true_wind_speed = math.sqrt(true_wind_x**2 + true_wind_y**2)
-                true_wind_dir = (math.degrees(math.atan2(true_wind_x, true_wind_y)) + 360) % 360
+                # calculate true wind speed and direction
+                twv = math.sqrt(twx**2 + twy**2)
+                twd = math.atan2(twy, twx)
+                twd_degrees = math.degrees(twd)
+                if twd_degrees < tolerance: twd_degrees = 360 + twd_degrees
 
                 # Assign to separate properties in the GeoDataFrame using loc
-                new_gdf.loc[idx, true_speed_prop] = true_wind_speed
-                new_gdf.loc[idx, true_dir_prop] = true_wind_dir
-
+                new_gdf.loc[idx, true_speed_prop] = twv
+                new_gdf.loc[idx, true_dir_prop] = twd_degrees
             except (ValueError, TypeError): 
                 # If there's any missing or invalid data, continue to the next row
                 continue
     
         result = PositionData.__new__(PositionData)
-        result.data = new_gdf.copy()
+        result.data = new_gdf.copy(deep=True)
 
         return result
     

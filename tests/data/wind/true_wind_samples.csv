@@ -1,0 +1,10 @@
+Description,Latitude,Longitude,Velocity,Direction,AIR:Speed,AIR:Direction,Reference:TrueWindSpeed,Reference:TrueWindDirection
+No movement headwind,56.86322147,24.11177270,0,0,3,0,3,0
+No movement crosswind right,56.86322147,24.11177270,0,0,3,90,3,90
+No movement crosswind left,56.86322147,24.11177270,0,0,3,270,3,270
+No movement tailwind,56.86322147,24.11177270,0,0,3,180,3,180
+North movement headwind,56.86322147,24.11177270,2,0,5,0,3,0
+South movement tailwind,56.86322147,24.11177270,2,180,1,180,3,0
+North movement crosswind right,56.86322147,24.11177270,2,0,3,45,2.1247,86.7267
+North movement crosswind left,56.86322147,24.11177270,2,0,5,-90,5.3851,248.1985
+North movement crosswind left-bottom,56.86322147,24.11177270,2,0,5,110,5.9866,128.2960

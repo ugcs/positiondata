@@ -141,7 +141,7 @@ class PositionData:
         
         # Create a new instance of PositionData with the modified data
         result = PositionData.__new__(PositionData)
-        result.data = self.data.copy()
+        result.data = self.data.copy(deep=True)
         return result
 
     def statistics(self, column, bins=10):
@@ -242,7 +242,7 @@ class PositionData:
 
         # Create a new instance of PositionData with direction data
         result = PositionData.__new__(PositionData)
-        result.data = self.data.copy()
+        result.data = self.data.copy(deep=True)
         result.data[direction_property] = directions
         return result
     
