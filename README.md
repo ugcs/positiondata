@@ -4,7 +4,7 @@ Python package for processing positional CSV data. The positional CSV data is ge
 Packase is maintained by [SPH Engineering](www.sphengineering.com) .
 
 # Classes/Features
-- [PositionData](#positiondata-class) - methods for loading data, filtering, clipping, export/import
+- [PositionData](#positiondata-class) - methods for loading, filtering, clipping, exporting data
 - [WindData](#winddata-class) - true wind vector processing, wind rose generation
 
 # Examples
