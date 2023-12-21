@@ -143,6 +143,18 @@ class PositionData:
         result = PositionData.__new__(PositionData)
         result.data = self.data.copy(deep=True)
         return result
+    
+    def columns(self):
+        """
+        Returns an array of column names in the GeoDataFrame.
+
+        :return: Array of column names.
+        """
+        # Check if data is not None
+        if self.data is None:
+            raise ValueError("Data is None. Cannot retrieve columns.")
+
+        return self.data.columns.to_numpy()
 
     def statistics(self, column, bins=10):
         """
