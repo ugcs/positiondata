@@ -1,10 +1,11 @@
 geopandas
-pandas
-numpy
-rasterio
-shapely
 geopy
-windrose
+numpy
+pandas
+rasterio
+scipy
 setuptools 
-wheel
+shapely
 twine
+wheel
+windrose
