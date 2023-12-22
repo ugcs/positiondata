@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='PositionData',
-    version='0.1.5',
+    version='0.1.6',
     packages=find_packages(),
     description='Gereferenced CSV data processing',
     long_description=open('README.md').read(),
