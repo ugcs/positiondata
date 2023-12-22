@@ -266,3 +266,73 @@ class PositionData:
         """
         self.data.to_file(output_path, driver="GeoJSON")
 
+    [staticmethod]
+    def calculate_ground_coordinates(row, altitude, earth_radius=6371000):  # Earth radius in meters
+        # Convert latitude, longitude, and angles from degrees to radians
+        lat_rad = math.radians(row['Latitude'])
+        lon_rad = math.radians(row['Longitude'])
+        pitch_rad = math.radians(row['Pitch'])  # Inclination from the vertical
+        roll_rad = math.radians(row['Roll'])    # Tilt from the vertical
+        yaw_rad = math.radians(row['Yaw'])      # Orientation relative to the north
+
+        # Calculate the direction vector of the laser beam in 3D space
+        # Assuming pitch and roll angles tilt the beam away from the downward vertical
+        # And yaw rotates this tilted beam around the vertical axis
+        # These calculations can be complex and depend on how pitch, roll, and yaw are defined
+        # The following is a simplification for illustration purposes
+        dx = math.sin(pitch_rad) * math.cos(yaw_rad) + math.sin(roll_rad) * math.sin(yaw_rad)
+        dy = math.sin(pitch_rad) * math.sin(yaw_rad) - math.sin(roll_rad) * math.cos(yaw_rad)
+        dz = -math.cos(pitch_rad) * math.cos(roll_rad)  # Negative as pointing downward
+
+        # Normalize the direction vector
+        length = math.sqrt(dx*dx + dy*dy + dz*dz)
+        dx /= length
+        dy /= length
+        dz /= length
+
+        # Calculate the horizontal distance based on altitude and direction
+        horizontal_distance = altitude / -dz
+
+        # Calculate the change in latitude and longitude
+        delta_lat = horizontal_distance * dy / earth_radius
+        delta_lon = horizontal_distance * dx / (earth_radius * math.cos(lat_rad))
+
+        # Convert back to degrees
+        delta_lat_deg = math.degrees(delta_lat)
+        delta_lon_deg = math.degrees(delta_lon)
+
+        # Calculate new latitude and longitude
+        new_lat = row['Latitude'] + delta_lat_deg
+        new_lon = row['Longitude'] + delta_lon_deg
+
+        return new_lat, new_lon  # Return a tuple
+    
+    def convert_to_ground_coordinates(self, altitude_above_ground):
+        """
+        Convert sensor coordinates to actual methane spot on the ground.
+
+        :param altitude_above_ground: Altitude of the sensor above the ground.
+        :return: A new instance of PositionData with converted coordinates.
+        """
+
+        # Check if CRS is EPSG:4326, return the current instance if not
+        if self.data.crs.to_string() != 'EPSG:4326':
+            return self
+
+        # Apply the calculation to each row
+        new_coords = self.data.apply(lambda row: PositionData.calculate_ground_coordinates(row, altitude_above_ground), axis=1)
+        new_latitudes, new_longitudes = zip(*new_coords)
+
+        # Create a new GeoDataFrame with updated latitude, longitude, and geometry
+        new_data = self.data.copy()
+        new_data['Latitude'] = new_latitudes
+        new_data['Longitude'] = new_longitudes
+        new_data['geometry'] = [Point(lon, lat) for lon, lat in zip(new_longitudes, new_latitudes)]
+
+        # Create a new PositionData instance with the updated data
+        new_position_data = PositionData.__new__(PositionData)
+        new_position_data.data = gpd.GeoDataFrame(new_data, crs=self.data.crs)
+
+        return new_position_data
+
+

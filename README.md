@@ -4,8 +4,9 @@ Python package for processing positional CSV data. The positional CSV data is ge
 Package is being maintained by [SPH Engineering](www.sphengineering.com) .
 
 # Classes/Features
-- [PositionData](#positiondata-class) - methods for loading, filtering, clipping, exporting data
+- [PositionData](#positiondata-class) - base methods for loading, filtering, clipping, exporting data
 - [WindData](#winddata-class) - true wind vector processing, wind rose generation
+- [MethaneData](#methanedata-class) - methane map generation
 
 # Examples
 ## Wind Data Processing Example
@@ -120,6 +121,20 @@ Applies a moving window filter to a specified property of the GeoDataFrame. This
 filtered_data = position_data.filter_noize('Velocity', 'average', 5)
 print(filtered_data)
 ```
+### `columns()`
+Retrieves an array of column names from the GeoDataFrame within the `PositionData` instance. This method provides a quick way to access and review the columns present in the geospatial dataset, aiding in data exploration and analysis.
+
+#### Returns:
+- **Array of Column Names**: An array containing the names of all columns in the GeoDataFrame.
+
+#### Example:
+```python
+# Assuming position_data is an instance of PositionData
+# Retrieve and print the column names
+column_names = position_data.columns()
+print("Column names:", column_names)
+```
+
 ### `statistics(column, bins=10)`
 Calculates and returns key statistics and a probability distribution for a selected column in the GeoDataFrame. This method is instrumental for understanding the distribution and central tendencies of data in a particular column, which is crucial for data analysis and decision-making.
 
@@ -214,5 +229,81 @@ Creates a gridded representation of the wind measurements. This method is useful
 # Assuming wind_data is an instance of WindData
 gridded_wind_data = wind_data.grid_wind('TrueWindSpeed', 'TrueWindDirection', method='linear', resolution=100)
 ```
+## MethaneData Class
+
+## Class Overview
+
+`MethaneData` is a Python class designed for processing and visualizing methane concentration data. It generates a GeoTIFF map based on methane readings, taking into account the location, status, and environmental thresholds of methane concentration.
+
+## Initialization
+
+### `__init__(position_data, methane_column='GAS:Methane', status_column='GAS:Status')`
+
+Initializes the `MethaneData` object.
+
+#### Parameters:
+
+- `position_data` (`PositionData`): An instance of `PositionData` containing methane readings along with location data.
+- `methane_column` (`str`): The name of the column in `PositionData` that contains methane readings. Default is `'GAS:Methane'`.
+- `status_column` (`str`): The name of the column in `PositionData` that indicates the status of methane readings. Default is `'GAS:Status'`.
+
+#### Description:
+
+The constructor initializes the `MethaneData` instance, cleaning the data in `position_data` by removing NaN values from the specified methane and status columns. It also sets the `NO_DATA_MAX_LEVEL` and `NO_DATA_VALUE` for handling missing data in the interpolation process.
+
+---
+
+## Methods
+
+### `map_methane(map_path, area_epsg, grid_rows=100, grid_columns=100, environment_methane_perc=95, ignore_invalid=True)`
+
+Generates a GeoTIFF map representing methane concentration levels.
+
+#### Parameters:
+
+- `map_path` (`str`): File path where the GeoTIFF file will be saved.
+- `area_epsg` (`str`): The EPSG code of the area for handling coordinate reference system conversions.
+- `grid_rows` (`int`): Number of rows in the interpolation grid. Default is 100.
+- `grid_columns` (`int`): Number of columns in the interpolation grid. Default is 100.
+- `environment_methane_perc` (`int`): The percentage used to determine the environmental methane threshold. Default is 95.
+- `ignore_invalid` (`bool`): If set to `True`, invalid readings (based on `status_column`) will be ignored. Default is `True`.
+
+#### Description:
+
+This method processes the methane data and generates a GeoTIFF map. It first filters out invalid readings if `ignore_invalid` is `True`. It then calculates an adjusted methane concentration by subtracting an environmental methane threshold (determined by `environment_methane_perc`) from the actual readings. The method interpolates these adjusted values over a specified grid and saves the result as a GeoTIFF file at `map_path`. 
+
+#### Notes:
+
+- The method checks if the coordinate reference system (CRS) of `position_data` is geographic (EPSG:4326). If it is not, CRS conversion is performed based on `area_epsg`.
+- Zero values in the interpolated grid are replaced with `NO_DATA_VALUE` to represent areas with no data.
+- The method handles NaN values and ensures that the output GeoTIFF correctly represents the methane concentration across the given area.
+
+---
+
+## Example Usage of `map_methane`
+
+```python
+from PositionData import PositionData
+from MethaneData import MethaneData
+
+# Assuming PositionData is already loaded with necessary columns
+position_data = PositionData('path/to/your/data.csv')
+
+# Create a MethaneData instance
+methane_data = MethaneData(position_data)
+
+# Path where the GeoTIFF will be saved
+output_map_path = 'path/to/save/methane_map.tif'
+
+# EPSG code for the area's coordinate system
+area_epsg = '32635'
+
+# Generate the methane concentration map
+methane_data.map_methane(map_path=output_map_path, 
+                         area_epsg=area_epsg, 
+                         grid_rows=100, 
+                         grid_columns=100, 
+                         environment_methane_perc=95, 
+                         ignore_invalid=True)
 
 

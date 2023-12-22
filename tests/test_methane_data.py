@@ -9,10 +9,10 @@ class TestMethaneData(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Load PositionData from a CSV file
-        cls.position_data = PositionData("tests/data/methane/2023-12-07-10-55-42-position.csv")
+        cls.position_data = PositionData("tests/data/methane/2023-12-07-flight1.csv")
 
         # Clip by a GeoJSON polygon (adjust the path to your GeoJSON file)
-        cls.clipped_position_data = cls.position_data.clip_by_polygon("tests/data/methane/area-2023-12-07.geojson")
+        cls.clipped_position_data = cls.position_data.clip_by_polygon("tests/data/methane/area-2023-12-07-flight1.geojson")
 
         # create temp dir
         cls.temp_dir = tempfile.mkdtemp() 

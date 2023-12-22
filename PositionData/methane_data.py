@@ -1,15 +1,8 @@
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 import numpy as np
-import os
 import rasterio
 from rasterio.transform import from_origin
 from rasterio import warp
-from scipy.interpolate import RBFInterpolator
-import shutil
-import tempfile
 from scipy.interpolate import griddata
-from rasterio.warp import calculate_default_transform, reproject, Resampling
 
 class MethaneData:
     def __init__(self, position_data, methane_column = 'GAS:Methane', status_column = 'GAS:Status'):
@@ -23,16 +16,18 @@ class MethaneData:
         self.position_data = position_data.clean_nan([methane_column, status_column])
         self.methane_column = methane_column
         self.status_column = status_column
+        self.NO_DATA_MAX_LEVEL = 10
+        self.NO_DATA_VALUE = -9999
 
-    def map_methane(self, map_path, area_epsg, grid_rows=100, grid_columns=100, environment_methane_perc=75, ignore_invalid=True):
+    def map_methane(self, map_path, area_epsg, grid_rows=100, grid_columns=100, environment_methane_perc=95, ignore_invalid=True):
         """
         Generate a geotiff map of methane readings.
 
         :param map_path: Path to save the geotiff file.
-                :param map_path: Path to save the geotiff file.
+        :param map_path: Path to save the geotiff file.
         :param grid_rows: Number of rows in the grid (default 100).
         :param grid_columns: Number of columns in the grid (default 100).
-        :param environment_methane_perc: Percentage to use for environment methane threshold (default 75).
+        :param environment_methane_perc: Percentage to use for environment methane threshold (default 95).
         :param ignore_invalid: Whether to ignore invalid readings (default True).
         """
         # Validate environment_methane
@@ -48,10 +43,11 @@ class MethaneData:
             # Filter data
         df = self.position_data.data
         if ignore_invalid:
-            df = df[df[self.status_column].isin([1, 2])]
+            df = df[df[self.status_column].isin([0, 1])]
 
         # Calculate methane threshold
         threshold = np.percentile(df[self.methane_column], environment_methane_perc)
+        print("Methane Threshold: ", threshold)
         df['adjusted_methane'] = df[self.methane_column] - threshold
         df['adjusted_methane'] = df['adjusted_methane'].clip(lower=0)
 
@@ -76,27 +72,25 @@ class MethaneData:
         # Interpolate z values on the grid
         Z = griddata((x, y), z, (X, Y), method='cubic').astype('float32')
 
-        Z = np.clip(Z, 0, None)
-
+        # build geo transform
         xsize = (xi.max() - xi.min()) / Z.shape[1]
         ysize = (yi.min() - yi.max()) / Z.shape[0]  # Negative value
         transform = from_origin(xi.min(), yi.min(), xsize, ysize)
 
-        # Set the desired NO_DATA value
-        no_data_value = -9999  # You can set this to any value that makes sense for your data
+        # Before writing, replace NaNs (or other values) with the NO_DATA value
+        Z_filled = np.where(np.logical_or(np.isnan(Z), Z < self.NO_DATA_MAX_LEVEL), self.NO_DATA_VALUE, Z)
+
 
         with rasterio.open(
             map_path,  # Output filename
             'w',
             driver='GTiff',
-            height=Z.shape[0],
-            width=Z.shape[1],
+            height=Z_filled.shape[0],
+            width=Z_filled.shape[1],
             count=1,
-            dtype=Z.dtype,
+            dtype=Z_filled.dtype,
             crs=df.crs,
             transform=transform,
-            nodata=no_data_value  # Specify the NO_DATA value here
+            nodata=self.NO_DATA_VALUE  # Specify the NO_DATA value here
         ) as dst:
-            # Before writing, replace NaNs (or other values) with the NO_DATA value
-            Z_filled = np.where(np.isnan(Z), no_data_value, Z)
             dst.write(Z_filled, 1)

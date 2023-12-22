@@ -20,9 +20,9 @@ class TestPositionData(unittest.TestCase):
         cls.wind1_platform_direction_column = "Direction"
 
         # Load PositionData from a CSV file
-        cls.falcon2_data = PositionData("tests/data/methane/2023-12-07-10-55-42-position.csv")
+        cls.falcon2_data = PositionData("tests/data/methane/2023-12-07-flight2.csv")
         # Clip by a GeoJSON polygon (adjust the path to your GeoJSON file)
-        cls.clipped_falcon2_data = cls.falcon2_data.clip_by_polygon("tests/data/methane/area-2023-12-07.geojson")
+        cls.clipped_falcon2_data = cls.falcon2_data.clip_by_polygon("tests/data/methane/area-2023-12-07-flight2.geojson")
         cls.falcon2_column_methane = "GAS:Methane"
         cls.falcon2_methane_min = 350
         cls.falcon2_methane_max = 500
