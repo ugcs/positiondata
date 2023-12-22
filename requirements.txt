@@ -1,5 +1,6 @@
 geopandas
 geopy
+haversine
 numpy
 pandas
 rasterio

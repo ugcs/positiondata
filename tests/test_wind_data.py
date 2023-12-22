@@ -63,7 +63,7 @@ class TestWindData(unittest.TestCase):
         # Use numpy.isclose for comparison with a tolerance
         speed_mismatching_rows = gdf[~np.isclose(gdf[self.reference_speed_prop], gdf[self.true_speed_prop], atol=tolerance)]
 
-        if(gdf.shape[0] > 0): 
+        if(speed_mismatching_rows.shape[0] > 0): 
             print(speed_mismatching_rows[[self.reference_speed_prop, self.true_speed_prop]])
         self.assertTrue(speed_mismatching_rows.shape[0] == 0)
         # direction mismatch
