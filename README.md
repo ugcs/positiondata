@@ -18,7 +18,7 @@ Package is being maintained by [SPH Engineering](www.sphengineering.com) .
 - [Trajectory](#trajectory-class) - creating and exporting geographic trajectories 
 
 # Examples
-## Wind Data Processing Example
+## Wind data processing
 
 This example demonstrates how to process wind data using the `PositionData` and `WindData` classes. The steps include loading data from a CSV file, clipping by a polygon, calculating the platform direction, and generating a windrose.
 
@@ -290,7 +290,7 @@ gridded_wind_data = wind_data.grid_wind('TrueWindSpeed', 'TrueWindDirection', me
 
 ## Initialization
 
-### `__init__(position_data, methane_column='GAS:Methane', status_column='GAS:Status')`
+### `MethaneData(position_data, methane_column='GAS:Methane', status_column='GAS:Status')`
 
 Initializes the `MethaneData` object.
 
@@ -340,9 +340,29 @@ The `Trajectory` class provides functionalities for creating, managing, and expo
 
 ## Initialization
 
-```python
-def __init__(position_data, date_column, time_column, tolerance, projection):
+### `Trajectory(position_data, date_column, time_column, tolerance, projection)`
 
+
+#### Description
+
+The `__init__` method initializes the `Trajectory` object, setting up essential parameters and generating the trajectory polyline. This method processes positional data with specified columns for date and time, creating a simplified trajectory representation.
+
+#### Parameters
+
+- `position_data` (PositionData): An instance of `PositionData` containing the positional information for the trajectory.
+- `date_column` (str): The name of the column in `position_data` that contains the date information.
+- `time_column` (str): The name of the column in `position_data` that contains the time information.
+- `tolerance` (float): The tolerance distance in meters for simplifying the trajectory. Determines how much deviation from the original path is allowed.
+- `projection` (str): The EPSG code of the projected coordinate system for distance calculations. A projected CRS is crucial for accurate distance measurements.
+
+### Example Usage
+
+```python
+from SkyHubDataProcessor import Trajectory
+
+# Example: Creating a Trajectory instance
+# Assume 'position_data' is an instance of PositionData with date and time columns
+trajectory = Trajectory(position_data, 'DateColumn', 'TimeColumn', tolerance=5.0, projection='EPSG:32635')
 ```
 ---
 
@@ -350,19 +370,19 @@ def __init__(position_data, date_column, time_column, tolerance, projection):
 
 ### `duration(unit='seconds')` 
 
-### Description
+#### Description
 
 The `duration` method of the `Trajectory` class calculates the total duration between the first and last record in the trajectory data. This duration is useful for understanding the time span covered by the trajectory, which can be important for analyses like calculating average speeds, understanding usage patterns, or synchronizing with other time-dependent data.
 
-### Parameters
+#### Parameters
 
 - `unit` (str, optional): Specifies the unit of time for the duration. The available options are `'seconds'`, `'minutes'`, and `'hours'`. The default is `'seconds'`.
 
-### Returns
+#### Returns
 
 - `float`: The duration between the first and last record in the specified unit of time.
 
-### Example Usage
+#### Example Usage
 
 ```python
 # Assuming 'trajectory' is an instance of the Trajectory class
@@ -371,23 +391,23 @@ duration_in_seconds = trajectory.duration(unit='seconds')
 
 ### `polyline()`
 
-### Description
+#### Description
 
 The `polyline` method generates a simplified representation of the trajectory as a polyline. This method simplifies the trajectory data to a LineString geometry based on a specified tolerance, which can be helpful for visualizing or analyzing the path in a more concise form.
 
-### Parameters
+#### Parameters
 
 - `output_path` (str): The file path where the simplified trajectory will be saved in GeoJSON format.
 - `tolerance` (float): The tolerance distance for simplification in meters. Smaller values will result in a polyline closer to the original trajectory, while larger values will produce a more simplified representation.
 - `projection` (str): The projection system to use for distance calculation during simplification. This should be a string representation of an EPSG code for a projected coordinate system.
 
-### Returns
+#### Returns
 
 - A tuple containing:
   - `GeoDataFrame`: A GeoDataFrame object containing the simplified polyline.
   - `float`: The length of the simplified polyline in the units of the specified projection system.
 
-### Example Usage
+#### Example Usage
 
 ```python
 # Assuming 'trajectory' is an instance of the Trajectory class
@@ -396,19 +416,19 @@ polyline_gdf, polyline_length = trajectory.polyline(output_path='simplified_traj
 
 ### `export_as_geojson(output_path)`
 
-### Description
+#### Description
 
 The `export_as_geojson` method exports the trajectory's simplified polyline as a GeoJSON file. This method is useful for creating a standard GeoJSON representation of the trajectory, which can be used in various GIS applications or for further geographic analyses. The method ensures that the exported GeoJSON is in the WGS 84 coordinate reference system (EPSG:4326), which is the standard for GeoJSON files.
 
-### Parameters
+#### Parameters
 
 - `output_path` (str): The file path where the GeoJSON file will be saved.
 
-### Returns
+#### Returns
 
 This method does not return a value. It creates a GeoJSON file at the specified `output_path`.
 
-### Example Usage
+#### Example Usage
 
 ```python
 # Assuming 'trajectory' is an instance of the Trajectory class
