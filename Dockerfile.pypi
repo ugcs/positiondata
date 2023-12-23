@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 COPY test_positiondata.sh /usr/src/app
 
 # Make the test script executable
-RUN chmod +x /usr/src/app/test_positiondata.sh
+RUN chmod +x /usr/src/app/test_package_validity.sh
 
 # Run the test script when the container launches
-CMD ["./test_positiondata.sh", "${EXPECTED_VERSION}"]
+CMD ["./test_package_validity.sh", "${EXPECTED_VERSION}"]

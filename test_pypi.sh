@@ -18,7 +18,7 @@ do
     echo "Testing with Python $PYTHON_VERSION"
 
     # Build the Docker image with the current Python version and expected package version
-    docker build --build-arg PYTHON_VERSION=$PYTHON_VERSION --build-arg EXPECTED_VERSION=$EXPECTED_VERSION -t positiondata_test .
+    docker build -f Dockerfile.pypi --build-arg PYTHON_VERSION=$PYTHON_VERSION --build-arg EXPECTED_VERSION=$EXPECTED_VERSION -t positiondata_test .
 
     # Run the Docker container
     docker run positiondata_test
