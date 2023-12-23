@@ -4,10 +4,9 @@ import math
 import numpy as np
 import pandas as pd
 from shapely.geometry import Point
-from scipy.interpolate import griddata
+from .position_base import PositionBase
 
-
-class PositionData:
+class PositionData(PositionBase):
     def __init__(self, input_file, file_format='csv', latitude_prop='Latitude', longitude_prop='Longitude', crs="epsg:4326"):
         """
         Initialize the PositionData object with data from a CSV or GeoJSON file.
@@ -264,7 +263,7 @@ class PositionData:
 
         :param output_path: Path to save the GeoJSON file.
         """
-        self.data.to_file(output_path, driver="GeoJSON")
+        self._export_as_geojson(self.data, output_path)
 
     [staticmethod]
     def calculate_ground_coordinates(row, altitude, earth_radius=6371000):  # Earth radius in meters

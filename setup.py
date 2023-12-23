@@ -13,6 +13,7 @@ setup(
     install_requires=[
         'geopandas',
         'pandas',
+        'pyproj',
         'numpy',
         'rasterio',
         'shapely',
