@@ -36,7 +36,7 @@ class TestTrajectory(unittest.TestCase):
     def test_polyline_generation(self):
         trajectory = Trajectory(self.position_data, 'Date', 'Time', 2, 'EPSG:32635')
         _, length = trajectory.polyline()
-        self.assertTrue(length > 0)  # Check that the length of the trajectory is greater than 0
+        self.assertEqual(round(length), 3069)  # Check that the length of the trajectory is greater than 0
 
     def test_export_to_geojson(self):
         trajectory = Trajectory(self.position_data, 'Date', 'Time', 2, 'EPSG:32635')
