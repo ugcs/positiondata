@@ -8,7 +8,7 @@ For a detailed class reference and examples, please refer to the [Development Gu
 
 To simply use the `PositionData` package, it can be installed from PyPI: [PositionData on PyPI](https://pypi.org/project/PositionData/).
 
-Package is being maintained by [SPH Engineering](www.sphengineering.com) .
+Package is being maintained by [SPH Engineering](www.sphengineering.com).
 
 ## Essential Development Tools
 
@@ -31,6 +31,12 @@ For development purposes, unit tests can be run using the following scripts:
 - `test_units.sh`: A script for quick testing, which runs unit tests directly.
 - `test_units_all_env.sh`: This script runs tests across all supported Python versions in Docker containers, ensuring compatibility and robustness.
 
+### Building and Publishing the Package
+
+- To build the package locally, use the `build.sh` script.
+- To publish the package to PyPI, use the `publish.sh` script. Before publishing, ensure that the `PYPI_TOKEN` environment variable is set to the correct value.
+- The `release.sh` script utilizes these two scripts as part of the release workflow.
+
 ### Releasing the Package
 
 To release a new version of the package, use the `release.sh` script. This script automates the process of testing, building, tagging, and publishing the package to PyPI.
@@ -38,3 +44,7 @@ To release a new version of the package, use the `release.sh` script. This scrip
 ### Testing the PyPI Package
 
 To test the current PyPI package across different Python versions, use the `test_pypi.sh` script. This script creates Docker containers for each Python version, installs the package from PyPI, and instantiates all classes to ensure everything is functioning as expected.
+
+## Documentation
+
+All API references and detailed documentation can be found in the [Development Guide (DEVGUIDE.md)](DEVGUIDE.md). Please remember to update the development guide when adding new functionality or making changes to existing features to keep the documentation current and useful for all users.
