@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='PositionData',
-    version='0.1.6',
+    version='0.1.7',
     packages=find_packages(),
     description='Gereferenced CSV data processing',
-    long_description=open('README.md').read(),
+    long_description=open('DEVGUIDE.md').read(),
     long_description_content_type='text/markdown',
     author='SPH Engineering',
     author_email='ayankelevich@ugcs.com',
