@@ -28,18 +28,18 @@ Unit tests and test data are located in the `tests` directory. These tests ensur
 
 For development purposes, unit tests can be run using the following scripts:
 
-- `test_units.sh`: A script for quick testing, which runs unit tests directly.
+- `test_units.sh`: A script for quick testing, which runs unit tests directly. To make script consitently running accross Windows and Linux environments use Linux styled line endings for the file. In VS Code "LF" for end of line sequence.  
 - `test_units_all_env.sh`: This script runs tests across all supported Python versions in Docker containers, ensuring compatibility and robustness.
+
+### Releasing the Package
+
+To release a new version of the package, use the `release.sh` script. This script automates the process of testing, building, tagging, and publishing the package to PyPI.
 
 ### Building and Publishing the Package
 
 - To build the package locally, use the `build.sh` script.
 - To publish the package to PyPI, use the `publish.sh` script. Before publishing, ensure that the `PYPI_TOKEN` environment variable is set to the correct value.
 - The `release.sh` script utilizes these two scripts as part of the release workflow.
-
-### Releasing the Package
-
-To release a new version of the package, use the `release.sh` script. This script automates the process of testing, building, tagging, and publishing the package to PyPI.
 
 ### Testing the PyPI Package
 

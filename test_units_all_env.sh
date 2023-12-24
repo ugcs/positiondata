@@ -9,7 +9,7 @@ do
     echo "Running unit tests with Python $PYTHON_VERSION"
 
     # Build the Docker image for the current Python version
-    docker build -f Dockerfile.units --build-arg PYTHON_VERSION=$PYTHON_VERSION -t positiondata_units:$PYTHON_VERSION .
+    docker build --no-cache -f Dockerfile.units --build-arg PYTHON_VERSION=$PYTHON_VERSION -t positiondata_units:$PYTHON_VERSION .
 
     # Run the Docker container
     docker run positiondata_units:$PYTHON_VERSION
