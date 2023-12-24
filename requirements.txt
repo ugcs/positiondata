@@ -1,7 +1,9 @@
 geopandas
 geopy
+haversine
 numpy
 pandas
+pyproj
 rasterio
 scipy
 setuptools 

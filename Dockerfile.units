@@ -1,0 +1,19 @@
+# Use an official Python runtime as a parent image
+ARG PYTHON_VERSION
+FROM python:${PYTHON_VERSION}
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Copy the source code and test script into the container
+COPY . /usr/src/app
+
+# Make the test script executable
+RUN chmod +x /usr/src/app/test_units.sh
+
+# Install any necessary dependencies
+# (Uncomment and modify if you have dependencies to install)
+RUN pip install -r requirements.txt
+
+# Run the test script when the container launches
+CMD ["./test_units.sh"]

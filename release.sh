@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Running tests..."
-./test.sh
+./test_units_all_versions.sh
 
 # Check if tests were successful
 if [ $? -eq 0 ]; then

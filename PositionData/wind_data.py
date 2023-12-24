@@ -104,7 +104,7 @@ class WindData:
             if prop not in self.position_data.data.columns:
                 raise ValueError(f"'{prop}' does not exist in the properties.")
 
-        data = self.position_data.data.dropna(subset=[speed_property, direction_property])
+        data = self.position_data.data.dropna(subset=[speed_property, direction_property]).copy(deep = True)
         # Convert the properties to float and drop non-numeric values (NaN)
         for prop in [speed_property, direction_property]:
             data[prop] = pd.to_numeric(data[prop], errors='coerce')

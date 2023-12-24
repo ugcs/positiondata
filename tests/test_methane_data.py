@@ -32,7 +32,6 @@ class TestMethaneData(unittest.TestCase):
     
     @classmethod
     def tearDownClass(cls):
-        # This is executed after each test
         # Remove the temporary directory
         if os.path.exists(cls.temp_dir) and cls.clean_temp:
             shutil.rmtree(cls.temp_dir)
