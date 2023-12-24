@@ -10,7 +10,7 @@ To simply use the `PositionData` package, it can be installed from PyPI: [Positi
 
 Package is being maintained by [SPH Engineering](www.sphengineering.com).
 
-## Essential Development Tools
+## To maintainers
 
 ### Source Code
 
