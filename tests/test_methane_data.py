@@ -17,12 +17,22 @@ class TestMethaneData(unittest.TestCase):
         # create temp dir
         cls.temp_dir = tempfile.mkdtemp() 
         cls.methane_map = os.path.join(cls.temp_dir, 'methane_map.tif')
-        cls.clean_temp = True
+        cls.clean_temp = False
         print("Methane temp: ", cls.temp_dir)
+
+    def test_clipped_methane_data_tiff_creation(self):
+        # Create a MethaneData instance
+        methane_data = MethaneData(self.clipped_position_data)
+
+        # Call the map_methane method
+        methane_data.map_methane(self.methane_map, '32635')
+
+        # Check if TIFF file is created
+        self.assertTrue(os.path.exists(self.methane_map))
 
     def test_methane_data_tiff_creation(self):
         # Create a MethaneData instance
-        methane_data = MethaneData(self.clipped_position_data)
+        methane_data = MethaneData(self.position_data)
 
         # Call the map_methane method
         methane_data.map_methane(self.methane_map, '32635')

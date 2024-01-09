@@ -41,7 +41,7 @@ class MethaneData:
             raise KeyError(f"'{self.methane_column}' column not found in the data.")
         
             # Filter data
-        df = self.position_data.data
+        df = self.position_data.clean_nan([self.methane_column]).data
         if ignore_invalid:
             df = df[df[self.status_column].isin([0, 1])]
 
@@ -63,6 +63,15 @@ class MethaneData:
         # Coordinates and values for interpolation
         x, y = df.geometry.x, df.geometry.y
         z = df['adjusted_methane']
+
+        # Assuming x, y, z are your data arrays or columns in a DataFrame
+        mask = ~np.isnan(x) & ~np.isnan(y) & ~np.isnan(z)
+        x_clean = x[mask]
+        y_clean = y[mask]
+        z_clean = z[mask]
+        x = x_clean
+        y = y_clean
+        z = z_clean
 
         # Create a grid
         xi = np.linspace(x.min(), x.max(), grid_columns)

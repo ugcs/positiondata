@@ -13,40 +13,16 @@ Package is being maintained by [SPH Engineering](www.sphengineering.com) .
 
 # Classes/Features
 - [PositionData](#positiondata-class) - base methods for loading, filtering, clipping, exporting data
-- [WindData](#winddata-class) - true wind vector processing, wind rose generation
 - [MethaneData](#methanedata-class) - methane map generation
 - [Trajectory](#trajectory-class) - creating and exporting geographic trajectories 
+- [WindData](#winddata-class) - true wind vector processing, wind rose generation
 
 # Examples
-## Wind data processing
-
-This example demonstrates how to process wind data using the `PositionData` and `WindData` classes. The steps include loading data from a CSV file, clipping by a polygon, calculating the platform direction, and generating a windrose.
-
-```python
-from PositionData import PositionData
-from PositionData  import WindData
-
-# Assuming 'data.csv' is your CSV file with wind data
-position_data = PositionData('data.csv')
-
-# Assuming 'clip_polygon.geojson' is your GeoJSON file with the clipping polygon
-clipped_data = position_data.clip_by_polygon('clip_polygon.geojson')
-
-# Calculate platform direction relative to north as a Direction column
-data_with_direction = clipped_data.calculate_direction('Direction')
-
-# Initialize wind data and generate true wind as TrueWindSpeed and TrueWindDirection
-wind_data = WindData(clipped_data, 'Air:Speed', 'Air:Direction', 'Velocity', 'Direction', 'TrueWindSpeed', 'TrueWindDirection')
-
-# Save the windrose plot as 'windrose.png'
-wind_data.build_windrose('TrueWindSpeed', 'TrueWindDirection', 'windrose.png')
-```
-
 ## Mapping methane leaks
 
 ```python
 from PositionData import PositionData
-from MethaneData import MethaneData
+from PositionData import MethaneData
 
 # Assuming PositionData is already loaded with necessary columns
 position_data = PositionData('path/to/your/data.csv')
@@ -84,6 +60,30 @@ print(f"Duration of the trajectory: {duration_in_minutes} minutes")
 # Generating polyline and estimating length
 polyline_gdf, length = trajectory.polyline()
 print(f"Length of the simplified trajectory: {length} meters")
+```
+
+## Wind data processing
+
+This example demonstrates how to process wind data using the `PositionData` and `WindData` classes. The steps include loading data from a CSV file, clipping by a polygon, calculating the platform direction, and generating a windrose.
+
+```python
+from PositionData import PositionData
+from PositionData  import WindData
+
+# Assuming 'data.csv' is your CSV file with wind data
+position_data = PositionData('data.csv')
+
+# Assuming 'clip_polygon.geojson' is your GeoJSON file with the clipping polygon
+clipped_data = position_data.clip_by_polygon('clip_polygon.geojson')
+
+# Calculate platform direction relative to north as a Direction column
+data_with_direction = clipped_data.calculate_direction('Direction')
+
+# Initialize wind data and generate true wind as TrueWindSpeed and TrueWindDirection
+wind_data = WindData(clipped_data, 'Air:Speed', 'Air:Direction', 'Velocity', 'Direction', 'TrueWindSpeed', 'TrueWindDirection')
+
+# Save the windrose plot as 'windrose.png'
+wind_data.build_windrose('TrueWindSpeed', 'TrueWindDirection', 'windrose.png')
 ```
 
 # Reference
@@ -226,61 +226,6 @@ Exports the current state of the GeoDataFrame to a GeoJSON file. This method is 
 # Assuming position_data is an instance of PositionData
 # Export the data to 'exported_data.geojson'
 position_data.export_as_geojson('exported_data.geojson')
-```
-## WindData Class
-
-The `WindData` class is designed for processing and analyzing wind data in a geospatial context. It includes methods for calculating true wind speed and direction, gridding measurements, and building windrose plots.
-
-## Initialization
-### `WindData(position_data, air_speed_prop, air_dir_prop, platform_speed_prop, platform_dir_prop, true_speed_prop, true_dir_prop, sensor_cw_rot=0, sensor_to_north=False)`
-Initializes the `WindData` object with an instance of `PositionData` and properties related to wind and platform motion. it automatically calculates tru wind vectors. 
-
-#### Parameters:
-- `position_data`: An instance of `PositionData`.
-- `air_speed_prop`: Property name for air speed.
-- `air_dir_prop`: Property name for air direction.
-- `platform_speed_prop`: Property name for platform speed.
-- `platform_dir_prop`: Property name for platform direction.
-- `true_speed_prop`: Property name for true wind speed.
-- `true_dir_prop`: Property name for true wind direction.
-- `sensor_cw_rot`: CW rotation of the sensor relative to the platform nose.
-- `sensor_to_north`: If true, sensor readings are related to North; otherwise, relative to the platform nose.
-
-#### Example:
-```python
-wind_data = WindData(position_data, 'Air:Speed', 'Air:Direction', 'Velocity', 'Direction', 'TrueWindSpeed', 'TrueWindDirection')
-```
-## Methods
-### `build_windrose(speed_col, direction_col, output_path, bins=[0,2,4,6,8,10], nsector=16, title="Windrose")`
-Builds and saves a windrose plot. This method is valuable for visually representing the distribution of wind speeds and directions, which is crucial in meteorological studies and applications such as sailing, aviation, and architecture.
-
-#### Parameters:
-- `speed_col`: Name of the wind speed column.
-- `direction_col`: Name of the wind direction column.
-- `output_path`: Path to save the generated windrose image.
-- `bins`: Binning for wind speed (default is `[0,2,4,6,8,10]`).
-- `nsector`: Number of sectors for the windrose (default is `16`).
-- `title`: Title of the windrose plot (default is `"Windrose"`).
-
-#### Example:
-```python
-# Assuming wind_data is an instance of WindData
-wind_data.build_windrose('TrueWindSpeed', 'TrueWindDirection', 'windrose.png', bins=[0,2,4,6,8,10], nsector=16, title="Windrose")
-```
-
-### `grid_wind(speed_property, direction_property, method='linear', resolution=100)`
-Creates a gridded representation of the wind measurements. This method is useful for visualizing and analyzing spatial variations in wind patterns, particularly in applications like meteorology, environmental monitoring, and renewable energy studies.
-
-#### Parameters:
-- `speed_property`: The name of the column representing wind speed.
-- `direction_property`: The name of the column representing wind direction.
-- `method`: The interpolation method for gridding (default is 'linear'). Other options are available as per `scipy.interpolate.griddata`.
-- `resolution`: The resolution of the grid (default is `100`). Higher values provide finer grids.
-
-#### Example:
-```python
-# Assuming wind_data is an instance of WindData
-gridded_wind_data = wind_data.grid_wind('TrueWindSpeed', 'TrueWindDirection', method='linear', resolution=100)
 ```
 ## MethaneData Class
 
@@ -435,4 +380,58 @@ This method does not return a value. It creates a GeoJSON file at the specified 
 trajectory.export_as_geojson('trajectory.geojson')
 print(f"Trajectory exported as GeoJSON to 'trajectory.geojson'")
 ```
+## WindData Class
 
+The `WindData` class is designed for processing and analyzing wind data in a geospatial context. It includes methods for calculating true wind speed and direction, gridding measurements, and building windrose plots.
+
+## Initialization
+### `WindData(position_data, air_speed_prop, air_dir_prop, platform_speed_prop, platform_dir_prop, true_speed_prop, true_dir_prop, sensor_cw_rot=0, sensor_to_north=False)`
+Initializes the `WindData` object with an instance of `PositionData` and properties related to wind and platform motion. it automatically calculates tru wind vectors. 
+
+#### Parameters:
+- `position_data`: An instance of `PositionData`.
+- `air_speed_prop`: Property name for air speed.
+- `air_dir_prop`: Property name for air direction.
+- `platform_speed_prop`: Property name for platform speed.
+- `platform_dir_prop`: Property name for platform direction.
+- `true_speed_prop`: Property name for true wind speed.
+- `true_dir_prop`: Property name for true wind direction.
+- `sensor_cw_rot`: CW rotation of the sensor relative to the platform nose.
+- `sensor_to_north`: If true, sensor readings are related to North; otherwise, relative to the platform nose.
+
+#### Example:
+```python
+wind_data = WindData(position_data, 'Air:Speed', 'Air:Direction', 'Velocity', 'Direction', 'TrueWindSpeed', 'TrueWindDirection')
+```
+## Methods
+### `build_windrose(speed_col, direction_col, output_path, bins=[0,2,4,6,8,10], nsector=16, title="Windrose")`
+Builds and saves a windrose plot. This method is valuable for visually representing the distribution of wind speeds and directions, which is crucial in meteorological studies and applications such as sailing, aviation, and architecture.
+
+#### Parameters:
+- `speed_col`: Name of the wind speed column.
+- `direction_col`: Name of the wind direction column.
+- `output_path`: Path to save the generated windrose image.
+- `bins`: Binning for wind speed (default is `[0,2,4,6,8,10]`).
+- `nsector`: Number of sectors for the windrose (default is `16`).
+- `title`: Title of the windrose plot (default is `"Windrose"`).
+
+#### Example:
+```python
+# Assuming wind_data is an instance of WindData
+wind_data.build_windrose('TrueWindSpeed', 'TrueWindDirection', 'windrose.png', bins=[0,2,4,6,8,10], nsector=16, title="Windrose")
+```
+
+### `grid_wind(speed_property, direction_property, method='linear', resolution=100)`
+Creates a gridded representation of the wind measurements. This method is useful for visualizing and analyzing spatial variations in wind patterns, particularly in applications like meteorology, environmental monitoring, and renewable energy studies.
+
+#### Parameters:
+- `speed_property`: The name of the column representing wind speed.
+- `direction_property`: The name of the column representing wind direction.
+- `method`: The interpolation method for gridding (default is 'linear'). Other options are available as per `scipy.interpolate.griddata`.
+- `resolution`: The resolution of the grid (default is `100`). Higher values provide finer grids.
+
+#### Example:
+```python
+# Assuming wind_data is an instance of WindData
+gridded_wind_data = wind_data.grid_wind('TrueWindSpeed', 'TrueWindDirection', method='linear', resolution=100)
+```
