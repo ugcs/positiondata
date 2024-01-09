@@ -17,7 +17,7 @@ class TestMethaneData(unittest.TestCase):
         # create temp dir
         cls.temp_dir = tempfile.mkdtemp() 
         cls.methane_map = os.path.join(cls.temp_dir, 'methane_map.tif')
-        cls.clean_temp = False
+        cls.clean_temp = True
         print("Methane temp: ", cls.temp_dir)
 
     def test_clipped_methane_data_tiff_creation(self):
