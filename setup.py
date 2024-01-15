@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='PositionData',
-    version='0.1.8',
+    version='0.1.9',
     packages=find_packages(),
     description='Georeferenced CSV data processing',
     long_description=open('DEVGUIDE.md').read(),

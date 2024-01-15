@@ -265,6 +265,14 @@ class PositionData(PositionBase):
         """
         self._export_as_geojson(self.data, output_path)
 
+    def export_as_csv(self, output_path):
+        """
+        Export the data as a CSV file.
+
+        :param output_path: Path to save the GeoJSON file.
+        """
+        self._export_as_csv(self.data, output_path)
+
     [staticmethod]
     def calculate_ground_coordinates(row, altitude, earth_radius=6371000):  # Earth radius in meters
         # Convert latitude, longitude, and angles from degrees to radians

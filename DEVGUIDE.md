@@ -227,6 +227,19 @@ Exports the current state of the GeoDataFrame to a GeoJSON file. This method is 
 # Export the data to 'exported_data.geojson'
 position_data.export_as_geojson('exported_data.geojson')
 ```
+
+### `export_as_csv(self, output_path)`
+Exports the current state of the GeoDataFrame to a CSV file. This method is useful for saving processed or analyzed geospatial data in a standardized format, which can then be used in various GIS applications or further data analysis tools.
+
+#### Parameters:
+- `output_path`: The file path where the CSV file will be saved.
+
+#### Example:
+```python
+# Assuming position_data is an instance of PositionData
+# Export the data to 'exported_data.geojson'
+position_data.export_as_csv('exported_data.geojson')
+```
 ## MethaneData Class
 
 ## Class Overview

@@ -1,3 +1,6 @@
+import os
+import shutil
+import tempfile
 import unittest
 from PositionData.position_data import PositionData  
 
@@ -28,6 +31,12 @@ class TestPositionData(unittest.TestCase):
         cls.falcon2_methane_max = 500
         cls.falcon2_filtered_rows = 106
 
+        # Create temp dir
+        cls.temp_dir = tempfile.mkdtemp()
+        cls.csv_path = os.path.join(cls.temp_dir, 'export.csv')
+        cls.clean_temp = True  # Set to True to clean up temp directory after tests
+        print("Position temp: ", cls.temp_dir)
+
     # Test shape
     def test_shape(self):
         shape = self.falcon1_data.shape()
@@ -55,6 +64,27 @@ class TestPositionData(unittest.TestCase):
     def test_filter_range(self):
         filtered = self.clipped_falcon2_data.filter_range(self.falcon2_column_methane, self.falcon2_methane_min, self.falcon2_methane_max)
         self.assertEqual(filtered.shape()[0], self.falcon2_filtered_rows)
+
+    # Test export as csv
+    def test_export_as_csv(self):
+        self.falcon1_data.export_as_csv(self.csv_path)
+        from_file = PositionData(self.csv_path)
+
+        # Get the columns from both GeoDataFrames
+        columns_from_file = from_file.columns()
+        columns_from_falcon1 = self.falcon1_data.columns()
+
+        # Check if the columns are equal
+        self.assertEqual(list(columns_from_file), list(columns_from_falcon1))
+
+        # Check if the shape is equal
+        self.assertEqual(self.falcon1_data.shape(), from_file.shape())
+    
+    @classmethod
+    def tearDownClass(cls):
+        # Remove the temporary directory
+        if os.path.exists(cls.temp_dir) and cls.clean_temp:
+            shutil.rmtree(cls.temp_dir)
 
 
 if __name__ == '__main__':
