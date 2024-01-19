@@ -20,6 +20,7 @@ class PositionData(PositionBase):
         """
         self.latitude_prop = latitude_prop
         self.longitude_prop = longitude_prop
+        self.skyhub_columns = ['GAS:Methane', 'GAS:Status', 'AIR:Speed', 'AIR:Direction']
 
         if file_format == 'csv':
             # Read the CSV file using pandas
@@ -55,6 +56,7 @@ class PositionData(PositionBase):
         instance.data = data
         instance.latitude_prop = self.latitude_prop
         instance.longitude_prop = self.longitude_prop
+        instance.skyhub_columns = self.skyhub_columns
         return instance
 
     def clean_nan(self, columns):
@@ -353,16 +355,36 @@ class PositionData(PositionBase):
         """
 
         # List of potential columns for deduplication
-        potential_columns = ['GAS:Methane', 'GAS:Status', 'AIR:Speed', 'AIR:Direction']
+        potential_columns = self.skyhub_columns
+        potential_columns.extend([self.latitude_prop, self.longitude_prop])
 
         # Filter out columns that are not in self.data.columns
         columns_to_use = [col for col in potential_columns if col in self.data.columns]
-
-        # Add latitude and longitude properties to the columns list
-        columns_to_use.extend([self.latitude_prop, self.longitude_prop])
 
         # Deduplicate the data
         deduplicated_df = self.data.drop_duplicates(subset=columns_to_use)
 
         # Create a new instance of PositionData with deduplicated data
         return self._init_new_instance(deduplicated_df)
+    
+    def cut_useless_skyhub_columns(self):
+        """
+        Keep only the columns specified in self.skyhub_columns and the 'geometry' column,
+        provided they exist in self.data.columns.
+
+        :return: A new instance of PositionData with the updated data.
+        """
+        # Check if self.skyhub_columns is a list
+        if not isinstance(self.skyhub_columns, list):
+            raise ValueError("skyhub_columns must be a list of column names")
+
+        # Filter columns that actually exist in self.data.columns and ensure 'geometry' is included
+        columns_to_keep = [col for col in self.skyhub_columns if col in self.data.columns]
+        if 'geometry' not in columns_to_keep:
+            columns_to_keep.append('geometry')
+
+        # Select only the specified columns
+        updated_df = self.data[columns_to_keep]
+
+        # Create a new instance of PositionData with the updated data
+        return self._init_new_instance(updated_df)

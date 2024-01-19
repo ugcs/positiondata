@@ -254,6 +254,23 @@ Deduplicates the GeoDataFrame stored in the `PositionData` instance. This method
 deduplicated_data = position_data.deduplicate_skyhub_data()
 ```
 
+### `cut_useless_skyhub_columns()`
+Streamlines the GeoDataFrame within the `PositionData` instance by retaining only a specified subset of columns. This method focuses on the columns listed in `self.skyhub_columns` and ensures that the essential 'geometry' column is also included. By filtering out unnecessary columns, this method helps in creating a more focused and relevant dataset, particularly useful in scenarios where only specific data points are of interest.
+
+- Keeps only the columns that are both listed in `self.skyhub_columns` and present in the GeoDataFrame.
+- Ensures the inclusion of the 'geometry' column, crucial for maintaining geospatial data integrity.
+- Excludes all other columns not specified in `self.skyhub_columns` or absent from the DataFrame.
+
+#### Returns:
+- A new instance of `PositionData` containing the streamlined GeoDataFrame.
+
+#### Example:
+```python
+# Assuming position_data is an instance of PositionData
+# Streamline the data to include only specified columns
+streamlined_data = position_data.cut_useless_skyhub_columns()
+```
+
 ## MethaneData Class
 
 ## Class Overview

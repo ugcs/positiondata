@@ -18,7 +18,7 @@ class TestMethaneData(unittest.TestCase):
         cls.temp_dir = tempfile.mkdtemp() 
         cls.methane_map = os.path.join(cls.temp_dir, 'methane_map.tif')
         cls.deduplicated_methane_map = os.path.join(cls.temp_dir, 'deduplicated_methane_map.tif')
-        cls.clean_temp = False
+        cls.clean_temp = True
         print("Methane temp: ", cls.temp_dir)
 
     def test_clipped_methane_data_tiff_creation(self):
@@ -33,7 +33,7 @@ class TestMethaneData(unittest.TestCase):
 
     def test_deduplicated_methane_data_tiff_creation(self):
         # Create a MethaneData instance
-        methane_data = MethaneData(self.clipped_position_data.deduplicate_skyhub_data())
+        methane_data = MethaneData(self.clipped_position_data.deduplicate_skyhub_data().cut_useless_skyhub_columns())
 
         # Call the map_methane method
         methane_data.map_methane(self.deduplicated_methane_map, '32635')
