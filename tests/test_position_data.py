@@ -30,6 +30,8 @@ class TestPositionData(unittest.TestCase):
         cls.falcon2_methane_min = 350
         cls.falcon2_methane_max = 500
         cls.falcon2_filtered_rows = 106
+        cls.falcon2_columns = 21
+        cls.falcon2_deduplicated_rows = 23320
 
         # Create temp dir
         cls.temp_dir = tempfile.mkdtemp()
@@ -79,6 +81,15 @@ class TestPositionData(unittest.TestCase):
 
         # Check if the shape is equal
         self.assertEqual(self.falcon1_data.shape(), from_file.shape())
+
+    def test_defuplicate_skyhub_data(self):
+        deduplicated = self.falcon2_data.deduplicate_skyhub_data()
+        
+        # Check if the columns are equal
+        self.assertEqual(list(deduplicated.columns()), list(self.falcon2_data.columns()))
+        
+        #check row number
+        self.assertEqual(deduplicated.shape(),(self.falcon2_deduplicated_rows, self.falcon2_columns))
     
     @classmethod
     def tearDownClass(cls):

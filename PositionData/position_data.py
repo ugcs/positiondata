@@ -18,6 +18,9 @@ class PositionData(PositionBase):
         :param longitude_prop: Name of the longitude column (default 'Longitude').
         :param crs: Coordinate reference system for the GeoDataFrame (default 'epsg:4326').
         """
+        self.latitude_prop = latitude_prop
+        self.longitude_prop = longitude_prop
+
         if file_format == 'csv':
             # Read the CSV file using pandas
             df = pd.read_csv(input_file)
@@ -40,7 +43,20 @@ class PositionData(PositionBase):
 
         else:
             raise ValueError("Invalid file format. Only 'csv' and 'geojson' are supported.")
-        
+
+    def _init_new_instance(self, data):
+        """
+        Create new instance of PositionData and transfer mandatory properties
+
+        :param data: dataframe
+        :return: A new instance of PositionData
+        """        
+        instance = PositionData.__new__(PositionData)
+        instance.data = data
+        instance.latitude_prop = self.latitude_prop
+        instance.longitude_prop = self.longitude_prop
+        return instance
+
     def clean_nan(self, columns):
         """
         Clean the data by removing rows with NaN values in the specified columns.
@@ -53,11 +69,7 @@ class PositionData(PositionBase):
 
         cleaned_df = self.data.dropna(subset=columns)
 
-        # Create a new PositionData instance with the cleaned data
-        cleaned_position_data = PositionData.__new__(PositionData)
-        cleaned_position_data.data = cleaned_df
-
-        return cleaned_position_data
+        return self._init_new_instance(cleaned_df)
             
     def shape(self):
         """
@@ -88,9 +100,7 @@ class PositionData(PositionBase):
                 (self.data[column_name].astype(float) <= max)
             ]
 
-        result = PositionData.__new__(PositionData)
-        result.data = filtered_data
-        return result
+        return self._init_new_instance(filtered_data)
         
 
     def clip_by_polygon(self, clip_polygon_geojson):
@@ -108,9 +118,8 @@ class PositionData(PositionBase):
         clipped_gdf = gpd.clip(self.data, clip_gdf)
 
         # Create and return a new instance of PositionData with the clipped data
-        result = PositionData.__new__(PositionData)
-        result.data = clipped_gdf
-        return result
+        return self._init_new_instance(clipped_gdf)
+
 
     def filter_noize(self, property_name, filter_type, window_size=3):
         """
@@ -139,9 +148,7 @@ class PositionData(PositionBase):
             raise ValueError(f"Unsupported statistic type: {filter_type}")
         
         # Create a new instance of PositionData with the modified data
-        result = PositionData.__new__(PositionData)
-        result.data = self.data.copy(deep=True)
-        return result
+        return self._init_new_instance(self.data.copy(deep=True))
     
     def columns(self):
         """
@@ -184,7 +191,7 @@ class PositionData(PositionBase):
         }
 
         # Calculate histogram for the probability distribution
-        counts, bin_edges = np.histogram(column_data, bins=bins)
+        counts, _ = np.histogram(column_data, bins=bins)
         probability_distribution = counts / counts.sum()
 
         stats['probability_distribution'] = probability_distribution.tolist()
@@ -252,8 +259,7 @@ class PositionData(PositionBase):
         directions.append(None)  # or some default value
 
         # Create a new instance of PositionData with direction data
-        result = PositionData.__new__(PositionData)
-        result.data = self.data.copy(deep=True)
+        result = self._init_new_instance(self.data.copy(deep=True))
         result.data[direction_property] = directions
         return result
     
@@ -337,9 +343,26 @@ class PositionData(PositionBase):
         new_data['geometry'] = [Point(lon, lat) for lon, lat in zip(new_longitudes, new_latitudes)]
 
         # Create a new PositionData instance with the updated data
-        new_position_data = PositionData.__new__(PositionData)
-        new_position_data.data = gpd.GeoDataFrame(new_data, crs=self.data.crs)
+        return self._init_new_instance(gpd.GeoDataFrame(new_data, crs=self.data.crs))
 
-        return new_position_data
+    def deduplicate_skyhub_data(self):
+        """
+        Deduplicate the data based on the specified columns.
 
+        :return: A new instance of PositionData with deduplicated data.
+        """
 
+        # List of potential columns for deduplication
+        potential_columns = ['GAS:Methane', 'GAS:Status', 'AIR:Speed', 'AIR:Direction']
+
+        # Filter out columns that are not in self.data.columns
+        columns_to_use = [col for col in potential_columns if col in self.data.columns]
+
+        # Add latitude and longitude properties to the columns list
+        columns_to_use.extend([self.latitude_prop, self.longitude_prop])
+
+        # Deduplicate the data
+        deduplicated_df = self.data.drop_duplicates(subset=columns_to_use)
+
+        # Create a new instance of PositionData with deduplicated data
+        return self._init_new_instance(deduplicated_df)

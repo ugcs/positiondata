@@ -240,6 +240,20 @@ Exports the current state of the GeoDataFrame to a CSV file. This method is usef
 # Export the data to 'exported_data.geojson'
 position_data.export_as_csv('exported_data.geojson')
 ```
+
+### `deduplicate_skyhub_data()`
+Deduplicates the GeoDataFrame stored in the `PositionData` instance. This method specifically targets a predefined set of columns related to skyhub data (like 'GAS:Methane', 'GAS:Status', 'AIR:Speed', 'AIR:Direction', along with latitude and longitude properties) for the deduplication process. It filters out the duplicates based on the intersection of these predefined columns and the columns actually present in the data. The method ensures that only unique records are retained, making the dataset more concise and relevant for analysis.
+
+#### Returns:
+- A new instance of `PositionData` containing the deduplicated data.
+
+#### Example:
+```python
+# Assuming position_data is an instance of PositionData
+# Deduplicate the data and store in a new instance
+deduplicated_data = position_data.deduplicate_skyhub_data()
+```
+
 ## MethaneData Class
 
 ## Class Overview
