@@ -13,10 +13,16 @@ class TestTrajectory(unittest.TestCase):
         # Assuming the PositionData class can be initialized with a CSV file path
         cls.position_data = PositionData('tests/data/methane/2023-12-07-flight1.csv').clean_nan(['Latitude', 'Longitude'])
 
+        # Clip trajectory
+        # Clip by a GeoJSON polygon (adjust the path to your GeoJSON file)
+        cls.clipped_falcon1_data = cls.position_data.clip_by_polygon("tests/data/methane/area-2023-12-07-flight1.geojson")
+
         # Create temp dir
         cls.temp_dir = tempfile.mkdtemp()
         cls.trajectory_path = os.path.join(cls.temp_dir, 'flight1-traj.json')
+        cls.trajectory_path_clipped = os.path.join(cls.temp_dir, 'flight1-traj-clipped.json')
         cls.clean_temp = True  # Set to True to clean up temp directory after tests
+
         print("Trajectory temp: ", cls.temp_dir)
 
     def test_initialization(self):
@@ -43,6 +49,12 @@ class TestTrajectory(unittest.TestCase):
         gdf, _ = trajectory.polyline()
         gdf.to_file(self.trajectory_path, driver='GeoJSON')
         self.assertTrue(os.path.exists(self.trajectory_path))
+
+    def test_export_to_geojson_clipped(self):
+        trajectory = Trajectory(self.clipped_falcon1_data, 'Date', 'Time', 2, 'EPSG:32635')
+        gdf, _ = trajectory.polyline()
+        gdf.to_file(self.trajectory_path_clipped, driver='GeoJSON')
+        self.assertTrue(os.path.exists(self.trajectory_path_clipped))
 
     @classmethod
     def tearDownClass(cls):

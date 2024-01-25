@@ -103,25 +103,24 @@ class PositionData(PositionBase):
             ]
 
         return self._init_new_instance(filtered_data)
-        
-
+    
     def clip_by_polygon(self, clip_polygon_geojson):
-        """
-        Clip the internal data with a provided polygon GeoJSON.
-
-        :param clip_polygon_geojson: Path to the GeoJSON file with the clipping polygon.
-
-        :return: New instance of PositionData with clipped data.
-        """
         # Load the clip polygon into a GeoDataFrame
         clip_gdf = gpd.read_file(clip_polygon_geojson)
+
+        # Store the original order
+        self.data['original_order'] = range(len(self.data))
 
         # Clip the internal data with the provided polygon
         clipped_gdf = gpd.clip(self.data, clip_gdf)
 
+        # Reorder based on the original order
+        clipped_gdf = clipped_gdf.sort_values(by='original_order').drop(columns='original_order')
+
+        self.data = self.data.drop(columns='original_order')
+
         # Create and return a new instance of PositionData with the clipped data
         return self._init_new_instance(clipped_gdf)
-
 
     def filter_noize(self, property_name, filter_type, window_size=3):
         """
